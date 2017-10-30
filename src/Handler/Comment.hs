@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 module Handler.Comment where
 
 import Import
@@ -10,10 +11,18 @@ data Comment =
 
 instance ToJSON Comment where
     toJSON (Comment message) = object
-        [ "content" .= message ]
+        [ "message" .= message ]
+instance FromJSON Comment where
+  parseJSON (Object o) = Comment
+    <$> o .: "message"
+  parseJSON _ = mzero
 
-getCommentR :: Handler TypedContent
-getCommentR = selectRep $ do
-  provideJson $ object ["result" .= x] where
-    x = Comment "Hello world"
+getCommentR :: Handler Value
+getCommentR = do
+  returnJson x where
+    x = [Comment "Hello World", Comment "Foo"]
 
+postCommentR :: Handler Value
+postCommentR = do
+  comment <- (requireJsonBody :: Handler Comment)
+  returnJson comment

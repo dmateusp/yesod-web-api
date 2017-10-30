@@ -1,1 +1,1 @@
-/comments CommentR GET
+/api/v1/comments CommentR GET POST
